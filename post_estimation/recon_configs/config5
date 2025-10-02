@@ -1,0 +1,92 @@
+[wandb]
+    log_wandb = true
+    project_name = 'fastMRI_complex'
+    
+[general]
+    device = 'cuda'
+
+[data]
+    dataset = 'fastMRI/complex_train_images'
+    n_data_points = 'all' #'all' or int # 'all' for full dataset
+    image_size = 128
+    num_channels = 2 
+
+[model]
+    latent_dimension_size = 200
+    local_connection_dist = 4
+    init_decoder_var = 1e-1
+    use_attention = true
+    use_group_norm = true
+    load_trained_supn_model = false
+    supn_model_load_path = 'checkpoints/supn_models/grey64/2023-09-12'
+    supn_model_save_path = 'checkpoints/supn_models'    
+
+
+[training]
+    batch_size = 32
+    optimiser = 'Adam'
+
+[cov_pix_ind]
+    col = 15
+    row = 12
+
+[recon_pars]
+    num_var_samples = 30
+    measurement_prop = 0.4
+    noise_sd = 0.001
+    mask_type = 'middle'
+    test_set = false
+    im_ind = 5
+
+# The order here is important! The execution script will carry out  
+# the training stages in the order specified here.
+
+# parameters can be 'mean', 'dec', 'chol' or 'all':
+# - 'mean' encoder parameters and decoder mean parameters
+# - 'dec'  decoder parameters (both mean and precision)
+# - 'chol' decoder precision parameters (fixed mean)
+# - 'all'  all encoder and decoder parameters
+
+# loss type can be 'VAE_loss' or 'log_likelihood_loss'
+
+[[train_schedule]]
+    learning_rate = 1e-3
+    parameters = 'mean'
+    num_epochs = 200
+    loss_type = 'VAE_loss'
+
+[[train_schedule]]
+    learning_rate = 1e-4
+    parameters = 'all'
+    num_epochs = 1000
+    loss_type = 'VAE_loss'
+
+[[train_schedule]]
+    learning_rate = 1e-4
+    parameters = 'all'
+    num_epochs = 1000
+    loss_type = 'VAE_loss'
+
+[[train_schedule]]
+    learning_rate = 1e-4
+    parameters = 'all'
+    num_epochs = 1000
+    loss_type = 'VAE_loss'
+
+[[train_schedule]]
+    learning_rate = 1e-4
+    parameters = 'dec'
+    num_epochs = 1000
+    loss_type = 'log_likelihood_loss'
+
+[[train_schedule]]
+    learning_rate = 1e-5
+    parameters = 'dec'
+    num_epochs = 500
+    loss_type = 'log_likelihood_loss'
+
+[[train_schedule]]
+    learning_rate = 1e-5
+    parameters = 'chol'
+    num_epochs = 500
+    loss_type = 'log_likelihood_loss'
